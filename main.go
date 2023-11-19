@@ -1229,24 +1229,54 @@ func GetCovidDetails(db *sql.DB) {
 		}
 
 		week_number := covid_data_list[i].Week_number
+		if week_number == "" {
+			continue
+		}
 
 		week_start := covid_data_list[i].Week_start
+		if week_start == "" {
+			continue
+		}
 
 		week_end := covid_data_list[i].Week_end
+		if week_end == "" {
+			continue
+		}
 
 		cases_weekly := covid_data_list[i].Cases_weekly
+		if cases_weekly == "" {
+			continue
+		}
 
 		cases_cumulative := covid_data_list[i].Cases_cumulative
+		if cases_cumulative == "" {
+			continue
+		}
 
 		case_rate_weekly := covid_data_list[i].Case_rate_weekly
+		if case_rate_weekly == "" {
+			continue
+		}
 
 		case_rate_cumulative := covid_data_list[i].Case_rate_cumulative
+		if case_rate_cumulative == "" {
+			continue
+		}
 
 		percent_tested_positive_weekly := covid_data_list[i].Percent_tested_positive_weekly
+		if percent_tested_positive_weekly == "" {
+			continue
+		}
 
 		percent_tested_positive_cumulative := covid_data_list[i].Percent_tested_positive_cumulative
+		if percent_tested_positive_cumulative == "" {
+			continue
+		}
 
 		population := covid_data_list[i].Population
+		if population == "" {
+			continue
+		}
 
 		sql := `INSERT INTO covid_details ("zip_code" , 
 		"week_number" , 
@@ -1261,7 +1291,7 @@ func GetCovidDetails(db *sql.DB) {
 		"population")
 		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,$11)`
 
-		_, err = db.Exec(zip_code,
+		_, err = db.Exec(sql, zip_code,
 			week_number,
 			week_start,
 			week_end,
@@ -1376,12 +1406,24 @@ func GetCCVIDetails(db *sql.DB) {
 		}
 
 		community_area_or_zip := CCVI_data_list[i].Community_area_or_ZIP_code
+		if community_area_or_zip == "" {
+			continue
+		}
 
 		community_name := CCVI_data_list[i].Community_name
+		if community_name == "" {
+			continue
+		}
 
 		ccvi_score := CCVI_data_list[i].CCVI_score
+		if ccvi_score == "" {
+			continue
+		}
 
 		ccvi_category := covid_data_list[i].CCVI_category
+		if ccvi_category == "" {
+			continue
+		}
 
 		sql := `INSERT INTO ccvi_details ("geography_type" , 
 		"community_area_or_zip" , 
@@ -1390,7 +1432,8 @@ func GetCCVIDetails(db *sql.DB) {
 		"ccvi_category")
 		values($1, $2, $3, $4, $5)`
 
-		_, err = db.Exec(geography_type,
+		_, err = db.Exec(sql,
+			geography_type,
 			community_area_or_zip,
 			community_name,
 			ccvi_score,
