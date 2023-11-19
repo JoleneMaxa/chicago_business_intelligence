@@ -195,7 +195,7 @@ type CCVIJsonRecords []struct {
 	CCVI_category              string `json:"ccvi_category"`
 }
 
-
+// text
 // Declare my database connection
 var db *sql.DB
 
