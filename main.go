@@ -85,7 +85,7 @@ import (
 	"time"
 
 	"github.com/kelvins/geocoder"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 )
 
 type TaxiTripsJsonRecords []struct {
@@ -195,7 +195,6 @@ type CCVIJsonRecords []struct {
 	CCVI_category              string `json:"ccvi_category"`
 }
 
-// text
 // Declare my database connection
 var db *sql.DB
 
@@ -280,8 +279,8 @@ func main() {
 		go GetBuildingPermits(db)
 		go GetTaxiTrips(db)
 
-		// go GetCovidDetails(db)
-		// go GetCCVIDetails(db)
+		go GetCovidDetails(db)
+		go GetCCVIDetails(db)
 
 		http.HandleFunc("/", handler)
 
