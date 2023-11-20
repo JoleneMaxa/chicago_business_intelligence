@@ -83,7 +83,6 @@ import (
 	"os"
 	"strconv"
 	"time"
-
 	"github.com/kelvins/geocoder"
 	"github.com/lib/pq"
 )
@@ -1419,7 +1418,7 @@ func GetCCVIDetails(db *sql.DB) {
 			continue
 		}
 
-		ccvi_category := covid_data_list[i].CCVI_category
+		ccvi_category := CCVI_data_list[i].CCVI_category
 		if ccvi_category == "" {
 			continue
 		}
