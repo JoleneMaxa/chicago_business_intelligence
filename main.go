@@ -86,7 +86,7 @@ import (
 	"github.com/kelvins/geocoder"
 	//"github.com/lib/pq"
 )
-
+// test
 type TaxiTripsJsonRecords []struct {
 	Trip_id                    string `json:"trip_id"`
 	Trip_start_timestamp       string `json:"trip_start_timestamp"`
