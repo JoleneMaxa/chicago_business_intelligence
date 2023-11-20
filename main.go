@@ -84,7 +84,7 @@ import (
 	"strconv"
 	"time"
 	"github.com/kelvins/geocoder"
-	//"github.com/lib/pq"
+	"github.com/lib/pq"
 )
 
 type TaxiTripsJsonRecords []struct {
@@ -222,7 +222,7 @@ func init() {
 
 	//Option 4
 	//Database application running on Google Cloud Platform.
-	db_connection := "user=postgres dbname=chicago_business_intelligence password=root host=/cloudsql/emerald-lattice-405618:us-central1:mypostgres sslmode=disable port = 5432"
+	db_connection := "user=postgres dbname=chicago_business_intelligence password=root host=/cloudsql/fifth-moment-405701:us-central1:mypostgres sslmode=disable port = 5432"
 
 	db, err = sql.Open("postgres", db_connection)
 	if err != nil {
