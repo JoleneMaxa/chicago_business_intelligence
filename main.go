@@ -86,7 +86,7 @@ import (
 	"github.com/kelvins/geocoder"
 	//"github.com/lib/pq"
 )
-// test
+
 type TaxiTripsJsonRecords []struct {
 	Trip_id                    string `json:"trip_id"`
 	Trip_start_timestamp       string `json:"trip_start_timestamp"`
@@ -278,8 +278,8 @@ func main() {
 		go GetBuildingPermits(db)
 		go GetTaxiTrips(db)
 
-		go GetCovidDetails(db)
-		go GetCCVIDetails(db)
+		//go GetCovidDetails(db)
+		//go GetCCVIDetails(db)
 
 		http.HandleFunc("/", handler)
 
@@ -1159,289 +1159,289 @@ func GetBuildingPermits(db *sql.DB) {
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
-func GetCovidDetails(db *sql.DB) {
-	fmt.Println("GetCovidDetails: Collecting COVID data")
+// func GetCovidDetails(db *sql.DB) {
+// 	fmt.Println("GetCovidDetails: Collecting COVID data")
 
-	drop_table := `drop table if exists covid_details`
-	_, err := db.Exec(drop_table)
-	if err != nil {
-		panic(err)
-	}
+// 	drop_table := `drop table if exists covid_details`
+// 	_, err := db.Exec(drop_table)
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	create_table := `CREATE TABLE IF NOT EXISTS "covid_details" (
-						"zip_code" VARCHAR(255), 
-						"week_number" VARCHAR(255), 
-						"week_start" VARCHAR(255), 
-						"week_end" VARCHAR(255), 
-						"cases_weekly" VARCHAR(255), 
-						"cases_cumulative" VARCHAR(255),												
-						"case_rate_weekly" VARCHAR(255), 
-						"case_rate_cumulative" VARCHAR(255), 
-						"percent_tested_positive_weekly" VARCHAR(255), 
-						"percent_tested_positive_cumulative" VARCHAR(255), 					
-						"population" VARCHAR(255) , 
-						PRIMARY KEY ("week_start") 
-					);`
+// 	create_table := `CREATE TABLE IF NOT EXISTS "covid_details" (
+// 						"zip_code" VARCHAR(255), 
+// 						"week_number" VARCHAR(255), 
+// 						"week_start" VARCHAR(255), 
+// 						"week_end" VARCHAR(255), 
+// 						"cases_weekly" VARCHAR(255), 
+// 						"cases_cumulative" VARCHAR(255),												
+// 						"case_rate_weekly" VARCHAR(255), 
+// 						"case_rate_cumulative" VARCHAR(255), 
+// 						"percent_tested_positive_weekly" VARCHAR(255), 
+// 						"percent_tested_positive_cumulative" VARCHAR(255), 					
+// 						"population" VARCHAR(255) , 
+// 						PRIMARY KEY ("week_start") 
+// 					);`
 
-	_, _err := db.Exec(create_table)
-	if _err != nil {
-		panic(_err)
-	}
+// 	_, _err := db.Exec(create_table)
+// 	if _err != nil {
+// 		panic(_err)
+// 	}
 
-	fmt.Println("Created Table for covid_details")
+// 	fmt.Println("Created Table for covid_details")
 
-	var url = "https://data.cityofchicago.org/resource/yhhz-zm2v.json"
+// 	var url = "https://data.cityofchicago.org/resource/yhhz-zm2v.json"
 
-	tr := &http.Transport{
-		MaxIdleConns:       10,
-		IdleConnTimeout:    300 * time.Second,
-		DisableCompression: true,
-	}
+// 	tr := &http.Transport{
+// 		MaxIdleConns:       10,
+// 		IdleConnTimeout:    300 * time.Second,
+// 		DisableCompression: true,
+// 	}
 
-	client := &http.Client{Transport: tr}
+// 	client := &http.Client{Transport: tr}
 
-	res, err := client.Get(url)
+// 	res, err := client.Get(url)
 
-	if err != nil {
-		panic(err)
-	}
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	fmt.Println("COVID Details by Area Code: Received data from SODA REST API for COVID by area code")
+// 	fmt.Println("COVID Details by Area Code: Received data from SODA REST API for COVID by area code")
 
-	body, _ := ioutil.ReadAll(res.Body)
-	var covid_data_list CovidJsonRecords
-	json.Unmarshal(body, &covid_data_list)
+// 	body, _ := ioutil.ReadAll(res.Body)
+// 	var covid_data_list CovidJsonRecords
+// 	json.Unmarshal(body, &covid_data_list)
 
-	s := fmt.Sprintf("\n\n COVID Details number of SODA records received = %d\n\n", len(covid_data_list))
-	io.WriteString(os.Stdout, s)
+// 	s := fmt.Sprintf("\n\n COVID Details number of SODA records received = %d\n\n", len(covid_data_list))
+// 	io.WriteString(os.Stdout, s)
 
-	for i := 0; i < len(covid_data_list); i++ {
+// 	for i := 0; i < len(covid_data_list); i++ {
 
-		// We will execute defensive coding to check for messy/dirty/missing data values
-		// There are different methods to deal with messy/dirty/missing data.
-		// We will use the simplest method: drop records that have messy/dirty/missing data
-		// Any record that has messy/dirty/missing data we don't enter it in the data lake/table
+// 		// We will execute defensive coding to check for messy/dirty/missing data values
+// 		// There are different methods to deal with messy/dirty/missing data.
+// 		// We will use the simplest method: drop records that have messy/dirty/missing data
+// 		// Any record that has messy/dirty/missing data we don't enter it in the data lake/table
 
-		zip_code := covid_data_list[i].Zip_code
-		if zip_code == "" {
-			continue
-		}
+// 		zip_code := covid_data_list[i].Zip_code
+// 		if zip_code == "" {
+// 			continue
+// 		}
 
-		week_number := covid_data_list[i].Week_number
-		if week_number == "" {
-			continue
-		}
+// 		week_number := covid_data_list[i].Week_number
+// 		if week_number == "" {
+// 			continue
+// 		}
 
-		week_start := covid_data_list[i].Week_start
-		if week_start == "" {
-			continue
-		}
+// 		week_start := covid_data_list[i].Week_start
+// 		if week_start == "" {
+// 			continue
+// 		}
 
-		week_end := covid_data_list[i].Week_end
-		if week_end == "" {
-			continue
-		}
+// 		week_end := covid_data_list[i].Week_end
+// 		if week_end == "" {
+// 			continue
+// 		}
 
-		cases_weekly := covid_data_list[i].Cases_weekly
-		if cases_weekly == "" {
-			continue
-		}
+// 		cases_weekly := covid_data_list[i].Cases_weekly
+// 		if cases_weekly == "" {
+// 			continue
+// 		}
 
-		cases_cumulative := covid_data_list[i].Cases_cumulative
-		if cases_cumulative == "" {
-			continue
-		}
+// 		cases_cumulative := covid_data_list[i].Cases_cumulative
+// 		if cases_cumulative == "" {
+// 			continue
+// 		}
 
-		case_rate_weekly := covid_data_list[i].Case_rate_weekly
-		if case_rate_weekly == "" {
-			continue
-		}
+// 		case_rate_weekly := covid_data_list[i].Case_rate_weekly
+// 		if case_rate_weekly == "" {
+// 			continue
+// 		}
 
-		case_rate_cumulative := covid_data_list[i].Case_rate_cumulative
-		if case_rate_cumulative == "" {
-			continue
-		}
+// 		case_rate_cumulative := covid_data_list[i].Case_rate_cumulative
+// 		if case_rate_cumulative == "" {
+// 			continue
+// 		}
 
-		percent_tested_positive_weekly := covid_data_list[i].Percent_tested_positive_weekly
-		if percent_tested_positive_weekly == "" {
-			continue
-		}
+// 		percent_tested_positive_weekly := covid_data_list[i].Percent_tested_positive_weekly
+// 		if percent_tested_positive_weekly == "" {
+// 			continue
+// 		}
 
-		percent_tested_positive_cumulative := covid_data_list[i].Percent_tested_positive_cumulative
-		if percent_tested_positive_cumulative == "" {
-			continue
-		}
+// 		percent_tested_positive_cumulative := covid_data_list[i].Percent_tested_positive_cumulative
+// 		if percent_tested_positive_cumulative == "" {
+// 			continue
+// 		}
 
-		population := covid_data_list[i].Population
-		if population == "" {
-			continue
-		}
+// 		population := covid_data_list[i].Population
+// 		if population == "" {
+// 			continue
+// 		}
 
-		sql := `INSERT INTO covid_details ("zip_code" , 
-		"week_number" , 
-		"week_start" , 
-		"week_end" , 
-		"cases_weekly" , 
-		"cases_cumulative" ,												
-		"case_rate_weekly" , 
-		"case_rate_cumulative" , 
-		"percent_tested_positive_weekly" , 
-		"percent_tested_positive_cumulative" , 					
-		"population")
-		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,$11)`
+// 		sql := `INSERT INTO covid_details ("zip_code" , 
+// 		"week_number" , 
+// 		"week_start" , 
+// 		"week_end" , 
+// 		"cases_weekly" , 
+// 		"cases_cumulative" ,												
+// 		"case_rate_weekly" , 
+// 		"case_rate_cumulative" , 
+// 		"percent_tested_positive_weekly" , 
+// 		"percent_tested_positive_cumulative" , 					
+// 		"population")
+// 		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,$11)`
 
-		_, err = db.Exec(sql, zip_code,
-			week_number,
-			week_start,
-			week_end,
-			cases_weekly,
-			cases_cumulative,
-			case_rate_weekly,
-			case_rate_cumulative,
-			percent_tested_positive_weekly,
-			percent_tested_positive_cumulative,
-			population)
+// 		_, err = db.Exec(sql, zip_code,
+// 			week_number,
+// 			week_start,
+// 			week_end,
+// 			cases_weekly,
+// 			cases_cumulative,
+// 			case_rate_weekly,
+// 			case_rate_cumulative,
+// 			percent_tested_positive_weekly,
+// 			percent_tested_positive_cumulative,
+// 			population)
 
-		if err != nil {
-			panic(err)
-		}
+// 		if err != nil {
+// 			panic(err)
+// 		}
 
-	}
+// 	}
 
-	fmt.Println("Completed Inserting Rows into the covid_details Table")
-}
+// 	fmt.Println("Completed Inserting Rows into the covid_details Table")
+// }
 
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
-//Sample dataset reviewed:
-//"geography_type":"CA",
-//"community_area_or_zip":"70",
-//"community_area_name":"Ashburn",
-//"ccvi_score":"45.1",
-//"ccvi_category":"MEDIUM",
-//"rank_socioeconomic_status":"34",
-//"rank_household_composition":"32",
-//"rank_adults_no_pcp":"28",
-//"rank_cumulative_mobility_ratio":"45",
-//"rank_frontline_essential_workers":"48",
-//"rank_age_65_plus":"29",
-//"rank_comorbid_conditions":"33",
-//"rank_covid_19_incidence_rate":"59",
-//"rank_covid_19_hospital_admission_rate":"66",
-//"rank_covid_19_crude_mortality_rate":"39",
-//"location":{"type":"Point",
-//			"coordinates":
-//					0	-87.7083657043
-//					1	41.7457577128
-//":@computed_region_rpca_8um6":"8",
-//":@computed_region_vrxf_vc4k":"69",
-//":@computed_region_6mkv_f3dw":"4300",
-//":@computed_region_bdys_3d7i":"199",
-//":@computed_region_43wa_7qmu":"30"
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////////////
+// //Sample dataset reviewed:
+// //"geography_type":"CA",
+// //"community_area_or_zip":"70",
+// //"community_area_name":"Ashburn",
+// //"ccvi_score":"45.1",
+// //"ccvi_category":"MEDIUM",
+// //"rank_socioeconomic_status":"34",
+// //"rank_household_composition":"32",
+// //"rank_adults_no_pcp":"28",
+// //"rank_cumulative_mobility_ratio":"45",
+// //"rank_frontline_essential_workers":"48",
+// //"rank_age_65_plus":"29",
+// //"rank_comorbid_conditions":"33",
+// //"rank_covid_19_incidence_rate":"59",
+// //"rank_covid_19_hospital_admission_rate":"66",
+// //"rank_covid_19_crude_mortality_rate":"39",
+// //"location":{"type":"Point",
+// //			"coordinates":
+// //					0	-87.7083657043
+// //					1	41.7457577128
+// //":@computed_region_rpca_8um6":"8",
+// //":@computed_region_vrxf_vc4k":"69",
+// //":@computed_region_6mkv_f3dw":"4300",
+// //":@computed_region_bdys_3d7i":"199",
+// //":@computed_region_43wa_7qmu":"30"
+// ////////////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////////////
 
-func GetCCVIDetails(db *sql.DB) {
-	fmt.Println("GetCCVIDetails: Collecting CCVI data")
+// func GetCCVIDetails(db *sql.DB) {
+// 	fmt.Println("GetCCVIDetails: Collecting CCVI data")
 
-	drop_table := `drop table if exists ccvi_details`
-	_, err := db.Exec(drop_table)
-	if err != nil {
-		panic(err)
-	}
+// 	drop_table := `drop table if exists ccvi_details`
+// 	_, err := db.Exec(drop_table)
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	create_table := `CREATE TABLE IF NOT EXISTS "ccvi_details" (
-						"geography_type" VARCHAR(255), 
-						"community_area_or_zip" VARCHAR(255), 
-						"community_area_name" VARCHAR(255), 
-						"ccvi_score" VARCHAR(255), 
-						"ccvi_category" VARCHAR(255), 
-						PRIMARY KEY ("community_area_name") 
-					);`
+// 	create_table := `CREATE TABLE IF NOT EXISTS "ccvi_details" (
+// 						"geography_type" VARCHAR(255), 
+// 						"community_area_or_zip" VARCHAR(255), 
+// 						"community_area_name" VARCHAR(255), 
+// 						"ccvi_score" VARCHAR(255), 
+// 						"ccvi_category" VARCHAR(255), 
+// 						PRIMARY KEY ("community_area_name") 
+// 					);`
 
-	_, _err := db.Exec(create_table)
-	if _err != nil {
-		panic(_err)
-	}
+// 	_, _err := db.Exec(create_table)
+// 	if _err != nil {
+// 		panic(_err)
+// 	}
 
-	fmt.Println("Created Table for ccvi_details")
+// 	fmt.Println("Created Table for ccvi_details")
 
-	var url = "https://data.cityofchicago.org/resource/2ns9-phjk.json"
+// 	var url = "https://data.cityofchicago.org/resource/2ns9-phjk.json"
 
-	tr := &http.Transport{
-		MaxIdleConns:       10,
-		IdleConnTimeout:    300 * time.Second,
-		DisableCompression: true,
-	}
+// 	tr := &http.Transport{
+// 		MaxIdleConns:       10,
+// 		IdleConnTimeout:    300 * time.Second,
+// 		DisableCompression: true,
+// 	}
 
-	client := &http.Client{Transport: tr}
+// 	client := &http.Client{Transport: tr}
 
-	res, err := client.Get(url)
+// 	res, err := client.Get(url)
 
-	if err != nil {
-		panic(err)
-	}
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	fmt.Println("CCVI: Received data from SODA REST API for CCVI")
+// 	fmt.Println("CCVI: Received data from SODA REST API for CCVI")
 
-	body, _ := ioutil.ReadAll(res.Body)
-	var CCVI_data_list CCVIJsonRecords
-	json.Unmarshal(body, &CCVI_data_list)
+// 	body, _ := ioutil.ReadAll(res.Body)
+// 	var CCVI_data_list CCVIJsonRecords
+// 	json.Unmarshal(body, &CCVI_data_list)
 
-	s := fmt.Sprintf("\n\n CCVI number of SODA records received = %d\n\n", len(CCVI_data_list))
-	io.WriteString(os.Stdout, s)
+// 	s := fmt.Sprintf("\n\n CCVI number of SODA records received = %d\n\n", len(CCVI_data_list))
+// 	io.WriteString(os.Stdout, s)
 
-	for i := 0; i < len(CCVI_data_list); i++ {
+// 	for i := 0; i < len(CCVI_data_list); i++ {
 
-		// We will execute defensive coding to check for messy/dirty/missing data values
-		// There are different methods to deal with messy/dirty/missing data.
-		// We will use the simplest method: drop records that have messy/dirty/missing data
-		// Any record that has messy/dirty/missing data we don't enter it in the data lake/table
+// 		// We will execute defensive coding to check for messy/dirty/missing data values
+// 		// There are different methods to deal with messy/dirty/missing data.
+// 		// We will use the simplest method: drop records that have messy/dirty/missing data
+// 		// Any record that has messy/dirty/missing data we don't enter it in the data lake/table
 
-		geography_type := CCVI_data_list[i].Geography_type
-		if geography_type == "" {
-			continue
-		}
+// 		geography_type := CCVI_data_list[i].Geography_type
+// 		if geography_type == "" {
+// 			continue
+// 		}
 
-		community_area_or_zip := CCVI_data_list[i].Community_area_or_ZIP_code
-		if community_area_or_zip == "" {
-			continue
-		}
+// 		community_area_or_zip := CCVI_data_list[i].Community_area_or_ZIP_code
+// 		if community_area_or_zip == "" {
+// 			continue
+// 		}
 
-		community_name := CCVI_data_list[i].Community_name
-		if community_name == "" {
-			continue
-		}
+// 		community_name := CCVI_data_list[i].Community_name
+// 		if community_name == "" {
+// 			continue
+// 		}
 
-		ccvi_score := CCVI_data_list[i].CCVI_score
-		if ccvi_score == "" {
-			continue
-		}
+// 		ccvi_score := CCVI_data_list[i].CCVI_score
+// 		if ccvi_score == "" {
+// 			continue
+// 		}
 
-		ccvi_category := CCVI_data_list[i].CCVI_category
-		if ccvi_category == "" {
-			continue
-		}
+// 		ccvi_category := CCVI_data_list[i].CCVI_category
+// 		if ccvi_category == "" {
+// 			continue
+// 		}
 
-		sql := `INSERT INTO ccvi_details ("geography_type" , 
-		"community_area_or_zip" , 
-		"community_name" , 
-		"ccvi_score" , 
-		"ccvi_category")
-		values($1, $2, $3, $4, $5)`
+// 		sql := `INSERT INTO ccvi_details ("geography_type" , 
+// 		"community_area_or_zip" , 
+// 		"community_name" , 
+// 		"ccvi_score" , 
+// 		"ccvi_category")
+// 		values($1, $2, $3, $4, $5)`
 
-		_, err = db.Exec(sql,
-			geography_type,
-			community_area_or_zip,
-			community_name,
-			ccvi_score,
-			ccvi_category)
+// 		_, err = db.Exec(sql,
+// 			geography_type,
+// 			community_area_or_zip,
+// 			community_name,
+// 			ccvi_score,
+// 			ccvi_category)
 
-		if err != nil {
-			panic(err)
-		}
+// 		if err != nil {
+// 			panic(err)
+// 		}
 
-	}
+// 	}
 
-	fmt.Println("Completed Inserting Rows into the ccvi_details Table")
-}
+// 	fmt.Println("Completed Inserting Rows into the ccvi_details Table")
+// }
