@@ -219,7 +219,7 @@ func init() {
 	// To find your Postgres container IP, use the command with your network name listed in the docker compose file as follows:
 	// docker network inspect cbi_backend
 	//db_connection := "user=postgres dbname=chicago_business_intelligence password=root host=162.123.0.9 sslmode=disable port = 5433"
-
+//add test
 	//Option 4
 	//Database application running on Google Cloud Platform.
 	db_connection := "user=postgres dbname=chicago_business_intelligence password=root host=/cloudsql/fifth-moment-405701:us-central1:mypostgres sslmode=disable port = 5432"
