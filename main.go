@@ -1301,8 +1301,7 @@ func GetCovidDetails(db *sql.DB) {
 			case_rate_cumulative,
 			percent_tested_positive_weekly,
 			percent_tested_positive_cumulative,
-			population
-			)
+			population)
 
 		if err != nil {
 			panic(err)
@@ -1437,8 +1436,7 @@ func GetCCVIDetails(db *sql.DB) {
 			community_area_or_zip,
 			community_name,
 			ccvi_score,
-			ccvi_category
-			)
+			ccvi_category)
 
 		if err != nil {
 			panic(err)
