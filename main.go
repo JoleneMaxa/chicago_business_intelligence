@@ -84,7 +84,7 @@ import (
 	"strconv"
 	"time"
 	"github.com/kelvins/geocoder"
-	"github.com/lib/pq"
+	//"github.com/lib/pq"
 )
 
 type TaxiTripsJsonRecords []struct {
