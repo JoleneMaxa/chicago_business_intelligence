@@ -28,3 +28,4 @@
 15. Then go check out the logs for each. Make sure the output is what you want.
 16. Grab the links from each. One of them will be Postgre Admin to check out the data you pulled is in the database.
 
+
