@@ -197,6 +197,7 @@ type CCVIJsonRecords []struct {
 // Declare my database connection
 var db *sql.DB
 
+
 // The main package can has the init function. 
 // The init function will be triggered before the main function
 
@@ -229,13 +230,6 @@ func init() {
 		log.Fatal(fmt.Println("Couldn't Open Connection to database"))
 		panic(err)
 	}
-
-	// Test the database connection
-	//err = db.Ping()
-	//if err != nil {
-	//	fmt.Println("Couldn't Connect to database")
-	//	panic(err)
-	//}
 
 }
 
@@ -300,14 +294,14 @@ func main() {
 		}
 
 		time.Sleep(24 * time.Hour)
+		
 	}
 
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-// test
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	name := os.Getenv("PROJECT_ID")
@@ -320,6 +314,52 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 /////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
+
+func retrieveRecord(w http.ResponseWriter, r *http.Request) {
+
+	// checks if the request is a "GET" request
+	if r.Method != "GET" {
+	http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
+	return
+	}
+	
+	// We assign the result to 'rows'
+	rowsRs, err := db.Query("SELECT * FROM Students")
+	
+	if err != nil {
+	http.Error(w, http.StatusText(500), http.StatusInternalServerError)
+	return
+	}
+	defer rowsRs.Close()
+	
+	
+	// creates placeholder of the sandbox
+	snbs := make([]sandbox, 0)
+	
+	
+	// we loop through the values of rows
+	for rows.Next() {
+	snb := sandbox{}
+	err := rowsRs.Scan(&snb.name, &snb.roll_number)
+	if err != nil {
+	log.Println(err)
+	http.Error(w, http.StatusText(500), 500)
+	return
+	}
+	snbs = append(snbs, snb)
+	}
+	
+	if err = rowsRs.Err(); err != nil {
+	http.Error(w, http.StatusText(500), 500)
+	return
+	}
+	
+	// loop and display the result in the browser
+	for _, snb := range snbs {
+	fmt.Fprintf(w, "%d %s %s %d\n", snb.name, snb.roll_number)
+	}
+	
+	}
 
 func GetTaxiTrips(db *sql.DB) {
 
@@ -528,6 +568,41 @@ func GetTaxiTrips(db *sql.DB) {
 			panic(err)
 		}
 
+	}
+
+	rowsRs, err := db.Query("SELECT * FROM taxi_trips")
+	
+	if err != nil {
+	http.Error(w, http.StatusText(500), http.StatusInternalServerError)
+	return
+	}
+	defer rowsRs.Close()
+	
+	
+	// creates placeholder of structure
+	snbs := make([]TaxiTripsJsonRecords, 0)
+	
+	
+	// we loop through the values of rows
+	for rows.Next() {
+	snb := TaxiTripsJsonRecords{}
+	err := rowsRs.Scan(&snb.name, &snb.roll_number)
+	if err != nil {
+	log.Println(err)
+	http.Error(w, http.StatusText(500), 500)
+	return
+	}
+	snbs = append(snbs, snb)
+	}
+	
+	if err = rowsRs.Err(); err != nil {
+	http.Error(w, http.StatusText(500), 500)
+	return
+	}
+	
+	// loop and display the result in the browser
+	for _, snb := range snbs {
+	fmt.Fprintf(w, "%d %s %s %d\n", snb.name, snb.roll_number)
 	}
 
 	fmt.Println("Completed Inserting Rows into the TaxiTrips Table")
@@ -755,6 +830,41 @@ func GetCommunityAreaUnemployment(db *sql.DB) {
 			panic(err)
 		}
 
+		
+	}
+	rowsRs, err := db.Query("SELECT * FROM community_area_unemployment")
+	
+	if err != nil {
+	http.Error(w, http.StatusText(500), http.StatusInternalServerError)
+	return
+	}
+	defer rowsRs.Close()
+	
+	
+	// creates placeholder of structure
+	snbs := make([]UnemploymentJsonRecords, 0)
+	
+	
+	// we loop through the values of rows
+	for rows.Next() {
+	snb := UnemploymentJsonRecords{}
+	err := rowsRs.Scan(&snb.name, &snb.roll_number)
+	if err != nil {
+	log.Println(err)
+	http.Error(w, http.StatusText(500), 500)
+	return
+	}
+	snbs = append(snbs, snb)
+	}
+	
+	if err = rowsRs.Err(); err != nil {
+	http.Error(w, http.StatusText(500), 500)
+	return
+	}
+	
+	// loop and display the result in the browser
+	for _, snb := range snbs {
+	fmt.Fprintf(w, "%d %s %s %d\n", snb.name, snb.roll_number)
 	}
 
 	fmt.Println("Completed Inserting Rows into the community_area_unemployment Table")
@@ -1121,6 +1231,41 @@ func GetBuildingPermits(db *sql.DB) {
 
 	}
 
+	rowsRs, err := db.Query("SELECT * FROM building_permits")
+	
+	if err != nil {
+	http.Error(w, http.StatusText(500), http.StatusInternalServerError)
+	return
+	}
+	defer rowsRs.Close()
+	
+	
+	// creates placeholder of structure
+	snbs := make([]BuildingPermitsJsonRecords, 0)
+	
+	
+	// we loop through the values of rows
+	for rows.Next() {
+	snb := BuildingPermitsJsonRecords{}
+	err := rowsRs.Scan(&snb.name, &snb.roll_number)
+	if err != nil {
+	log.Println(err)
+	http.Error(w, http.StatusText(500), 500)
+	return
+	}
+	snbs = append(snbs, snb)
+	}
+	
+	if err = rowsRs.Err(); err != nil {
+	http.Error(w, http.StatusText(500), 500)
+	return
+	}
+	
+	// loop and display the result in the browser
+	for _, snb := range snbs {
+	fmt.Fprintf(w, "%d %s %s %d\n", snb.name, snb.roll_number)
+	}
+
 	fmt.Println("Completed Inserting Rows into the Building Permits Table")
 }
 
@@ -1308,6 +1453,41 @@ func GetCovidDetails(db *sql.DB) {
 
 	}
 
+	rowsRs, err := db.Query("SELECT * FROM covid_details")
+	
+	if err != nil {
+	http.Error(w, http.StatusText(500), http.StatusInternalServerError)
+	return
+	}
+	defer rowsRs.Close()
+	
+	
+	// creates placeholder of structure
+	snbs := make([]CovidJsonRecords, 0)
+	
+	
+	// we loop through the values of rows
+	for rows.Next() {
+	snb := CovidJsonRecords{}
+	err := rowsRs.Scan(&snb.name, &snb.roll_number)
+	if err != nil {
+	log.Println(err)
+	http.Error(w, http.StatusText(500), 500)
+	return
+	}
+	snbs = append(snbs, snb)
+	}
+	
+	if err = rowsRs.Err(); err != nil {
+	http.Error(w, http.StatusText(500), 500)
+	return
+	}
+	
+	// loop and display the result in the browser
+	for _, snb := range snbs {
+	fmt.Fprintf(w, "%d %s %s %d\n", snb.name, snb.roll_number)
+	}
+
 	fmt.Println("Completed Inserting Rows into the covid_details Table")
 }
 
@@ -1441,6 +1621,41 @@ func GetCCVIDetails(db *sql.DB) {
 			panic(err)
 		}
 
+	}
+
+	rowsRs, err := db.Query("SELECT * FROM ccvi_details")
+	
+	if err != nil {
+	http.Error(w, http.StatusText(500), http.StatusInternalServerError)
+	return
+	}
+	defer rowsRs.Close()
+	
+	
+	// creates placeholder of structure
+	snbs := make([]CcviJsonRecords, 0)
+	
+	
+	// we loop through the values of rows
+	for rows.Next() {
+	snb := CcviJsonRecords{}
+	err := rowsRs.Scan(&snb.name, &snb.roll_number)
+	if err != nil {
+	log.Println(err)
+	http.Error(w, http.StatusText(500), 500)
+	return
+	}
+	snbs = append(snbs, snb)
+	}
+	
+	if err = rowsRs.Err(); err != nil {
+	http.Error(w, http.StatusText(500), 500)
+	return
+	}
+	
+	// loop and display the result in the browser
+	for _, snb := range snbs {
+	fmt.Fprintf(w, "%d %s %s %d\n", snb.name, snb.roll_number)
 	}
 
 	fmt.Println("Completed Inserting Rows into the ccvi_details Table")
